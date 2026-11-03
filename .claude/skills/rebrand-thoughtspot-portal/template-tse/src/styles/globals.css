@@ -174,6 +174,7 @@ button {
   display: flex;
   align-items: center;
   gap: 28px;
+  flex: 0 0 auto;
 }
 .topbar-platform-nav {
   display: flex;
@@ -220,7 +221,16 @@ button {
   background: var(--sl-cream);
   padding: 5px;
   border-radius: 12px;
+  /* Never push the logo or the right cluster off-screen: the tab pill may shrink
+     and, as a last resort, scroll its own contents instead of overlapping /
+     overflowing the viewport. */
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.topbar-tabs::-webkit-scrollbar { display: none; }
 .topbar-tab {
   display: inline-flex;
   align-items: center;
@@ -251,6 +261,7 @@ button {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex: 0 0 auto;
 }
 .topbar-theme-toggle {
   display: inline-flex;
@@ -2031,9 +2042,25 @@ button {
   .login-left {
     display: none;
   }
-  .topbar-platform-nav {
-    display: none;
-  }
+}
+/* Drop the decorative platform links (Broker/Shipper) before they'd collide with
+   the tab pill, and tighten the tabs on smaller screens, so the top bar never
+   overlaps or overflows regardless of how many tabs are enabled. */
+@media (max-width: 1400px) {
+  .topbar-platform-nav { display: none; }
+}
+@media (max-width: 1360px) {
+  /* The username (often a long email) is the widest optional item — drop it to
+     the avatar so the tabs keep their room before they'd clip. */
+  .topbar-username { display: none; }
+}
+@media (max-width: 1200px) {
+  .topbar-tabs { gap: 4px; }
+  .topbar-tab { padding: 9px 12px; }
+}
+@media (max-width: 1040px) {
+  .topbar-tab { padding: 8px 10px; }
+  .topbar-tab span { font-size: 13px; }
 }
 @media (max-width: 720px) {
   .topbar-username {
