@@ -3604,6 +3604,9 @@ body, .fw-shell, .fw-shell .app-main { font-family: 'Figtree', system-ui, sans-s
 /* In-flow answers */
 .fwh-answers { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px; margin-bottom: 16px; }
 .fwh-number, .fwh-top { display: flex; flex-direction: column; padding: 18px 20px 14px; }
+/* Standalone "what changed" card (not inside .fwh-answers) — restore the gap to
+   the KPI row below so the two rows don't touch. */
+.fwh-number-wide { margin-bottom: 16px; }
 .fwh-answer-q { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: var(--ea-muted); }
 .fwh-answer-q::before {
   content: ''; width: 8px; height: 8px; border-radius: 50%;
