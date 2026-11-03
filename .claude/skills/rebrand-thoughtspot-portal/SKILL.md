@@ -28,6 +28,32 @@ the bundled template's, so nothing to install per app.
 The codemod copies the template to `<client>-tse/` (kebab-case) in the current project,
 excluding `node_modules dist .vercel .env.local`.
 
+## Prerequisite — Node.js (check once, before the first build)
+
+The codemod and the generated Vite app need Node. Verify it early (up front, or just
+before Step 2). If it's missing, install it — **no admin rights required** — so a
+Node-less user never hits a wall:
+
+1. **Check:** run `node -v`, and also `~/.node/bin/node -v` (it may be installed there
+   but off PATH). If either prints a version, you're set — skip the install.
+2. **If Node is missing**, ask the user's OK (it's a system change + needs internet),
+   then install it to `~/.node` (no sudo), auto-detecting OS/arch:
+   ```bash
+   VER=v22.13.1
+   OS=$(uname -s | tr '[:upper:]' '[:lower:]')            # darwin | linux
+   ARCH=$(uname -m); [ "$ARCH" = "aarch64" ] && ARCH=arm64; [ "$ARCH" = "x86_64" ] && ARCH=x64
+   curl -fsSL "https://nodejs.org/dist/$VER/node-$VER-$OS-$ARCH.tar.gz" | tar -xz -C /tmp
+   rm -rf ~/.node && mv "/tmp/node-$VER-$OS-$ARCH" ~/.node
+   export PATH="$HOME/.node/bin:$PATH"
+   ```
+   (Windows: install from https://nodejs.org/en/download instead of the tarball.)
+3. Prepend `~/.node/bin` to PATH for every `node`/`npm`/`npx` you run, and offer to
+   append that line to the user's `~/.zshrc` so future terminals see it. Confirm
+   `node -v` works, then continue.
+
+This makes the skill self-sufficient regardless of entry path — even if the user
+skipped the onboarding prompt and just asked you to build a portal.
+
 ## Step 0 — Show the "gather-first" card (before any question)
 
 People stall mid-interview when a question asks for a GUID they don't have open. So
@@ -70,18 +96,18 @@ Rounds marked **[ADVANCED ONLY]** are skipped entirely in Basic mode.
 
 **Feature reference — MANDATORY step, do NOT skip (Advanced only).** Images can't render
 inside the `AskUserQuestion` popup, so **as the very first action when you reach Round 3
-(before asking anything in it), you MUST call the `Artifact` tool to publish the bundled
-gallery and paste its link to the user.** This is a real tool call, not a description:
+(before asking anything in it), you MUST paste the feature-reference link to the user.**
+Do NOT publish an Artifact — use this fixed, already-shared link:
 
-> Artifact `file_path`: `.claude/skills/rebrand-thoughtspot-portal/references/feature-reference.html`
-> (adjust the leading path only if the skill lives elsewhere; the file is always at
-> `<skill-folder>/references/feature-reference.html`). Then say, verbatim:
-> *"Here's a visual reference for the optional features as we go: `<artifact link>`."*
+> https://docs.google.com/document/d/1tDzpqJ2JSa4yzjICeJzLBu8Wile7PFuAwbM1ZpoBjs0/edit?usp=sharing
+>
+> Say, verbatim:
+> *"Here's a visual reference for the optional features as we go: <link above>."*
 
-It shows mockups of the four optional features (Inline insights, Custom action,
-Monetization paywall, Add Report), and each feature round below points the user to its
-section. If you find yourself asking the Round 3 gate **without** having posted this link,
-stop and post it first. In **Basic** mode, skip it (those rounds don't run).
+It shows the four optional features (Inline insights, Custom action, Monetization paywall,
+Add Report), and each feature round below points the user to its section. If you find
+yourself asking the Round 3 gate **without** having posted this link, stop and post it
+first. In **Basic** mode, skip it (those rounds don't run).
 
 ---
 
@@ -127,13 +153,21 @@ URL formats vary by version. If the user pastes a **bare GUID with no URL**, you
 the type — ask which it is. Map each confirmed value to its spec field (analyticsLiveboard,
 model, inlineLiveboard, actionLiveboard + actionViz).
 
-…then `AskUserQuestion`:
+…then `AskUserQuestion` — ask **both** questions below in the **same popup**:
 - question: `How should the embedded ThoughtSpot content authenticate?`
 - header: `Auth` · multiSelect: false
 - options:
   - `Basic – typed credentials (Recommended)` — A username/password login gate in the app.
   - `None – ride existing session` — Embeds use whatever ThoughtSpot session is already signed in. Simplest for demos.
   - `Trusted – advanced` — Token-based trusted auth; needs backend setup.
+- question: `How should the app's navigation look?`
+- header: `Nav layout` · multiSelect: false
+- options:
+  - `Top bar` — Horizontal tabs across the top (the default look).
+  - `Left sidebar` — A vertical left-hand nav panel, matching many enterprise app UIs.
+
+Record the nav answer as `features.navLayout` (`top` | `sidebar`). If the user shared a
+brand/product screenshot whose menu is a left panel, prefer `sidebar` and confirm.
 
 **ROUND 3 — Inline-insights tab** · **[ADVANCED ONLY]** · *(point them to the "Inline insights" mockup in the feature reference)* · `AskUserQuestion` gate:
 - question: `Add an inline-insights tab? (List where each row of the Client App expands to reveal a ThoughtSpot Liveboard / component filtered to the list item)`

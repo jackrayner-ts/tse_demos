@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext';
 import { useTier } from './context/TierContext';
 import Login from './pages/Login';
 import TopBar, { TabId, PREMIUM_ONLY_TABS } from './components/TopBar';
+import SideNav from './components/SideNav';
 import ChatBot from './components/ChatBot';
 import Landing from './tabs/Landing';
 import Overview from './tabs/Overview';
@@ -53,9 +54,17 @@ export default function App() {
     return <Login />;
   }
 
+  // 'top' = horizontal top bar; 'sidebar' = left panel. Cast to string so the
+  // literal default ('top') doesn't narrow the comparison away at compile time.
+  const isSideNav = (FLAGS.navLayout as string) === 'sidebar';
+
   return (
-    <div className="app-shell">
-      <TopBar active={tab} onChange={changeTab} />
+    <div className={`app-shell${isSideNav ? ' is-sidenav' : ''}`}>
+      {isSideNav ? (
+        <SideNav active={tab} onChange={changeTab} />
+      ) : (
+        <TopBar active={tab} onChange={changeTab} />
+      )}
       <main className="app-main">
         {tab === 'home' &&
           ((FLAGS.homeStyle as string) === 'landing' ? (
