@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import TopBar, { TabId, PREMIUM_ONLY_TABS } from './components/TopBar';
 import ChatBot from './components/ChatBot';
 import Landing from './tabs/Landing';
+import Overview from './tabs/Overview';
 import MyAnalytics from './tabs/MyAnalytics';
 import { FLAGS } from './flags';
 import Analytics from './tabs/Analytics';
@@ -56,7 +57,12 @@ export default function App() {
     <div className="app-shell">
       <TopBar active={tab} onChange={changeTab} />
       <main className="app-main">
-        {tab === 'home' && <Landing onNavigate={changeTab} />}
+        {tab === 'home' &&
+          ((FLAGS.homeStyle as string) === 'landing' ? (
+            <Landing onNavigate={changeTab} />
+          ) : (
+            <Overview onNavigate={changeTab} />
+          ))}
         {tab === 'my-analytics' && <MyAnalytics />}
         {tab === 'analytics' && <Analytics />}
         {tab === 'carriers' && <Carriers />}
